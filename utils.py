@@ -8,20 +8,31 @@ from excel_handler import backup_excel
 
 
 def merge_to_master(new_stock_df):
-    # Backup master first
+    master_columns = ["UID", "Brand", "Model", "Color", "Size", "Quantity"]
+
+    # Ensure new stock has only the required columns
+    new_stock_core = new_stock_df[master_columns]
+
+    # Backup master before updating
     if os.path.exists(MASTER_FILE):
         backup_excel(MASTER_FILE)
         master_df = pd.read_excel(MASTER_FILE)
     else:
-        master_df = pd.DataFrame(columns=new_stock_df.columns)
+        master_df = pd.DataFrame(columns=master_columns)
 
-    # Merge: sum quantities for duplicate UIDs
-    combined = pd.concat([master_df, new_stock_df], ignore_index=True)
-    combined = combined.groupby(["UID","Brand","Model","Color","Size"], as_index=False).agg({"Quantity":"sum"})
+    # Combine master + new stock
+    combined = pd.concat([master_df, new_stock_core], ignore_index=True)
 
-    # Save back
+    # 🔹 Group by identifiers and sum quantities
+    combined = (
+        combined.groupby(["UID", "Brand", "Model", "Color", "Size"], as_index=False)
+        .agg({"Quantity": "sum"})
+    )
+
+    # Save updated master
     combined.to_excel(MASTER_FILE, index=False)
     print(f"💾 Master inventory updated: {MASTER_FILE}")
+
 
 def save_mappings(mappings):
     """Save all mapping DataFrames back into code_mappings.xlsx"""
@@ -38,9 +49,9 @@ def load_mappings():
         mappings = pd.read_excel(path, sheet_name=None)  # returns dict of DataFrames
     else:
         mappings = {
-            "Brand": pd.DataFrame(columns=["Brand", "Code"]),
-            "Model": pd.DataFrame(columns=["Model", "Code"]),
-            "Color": pd.DataFrame(columns=["Color", "Code"])
+            "BrandCodes": pd.DataFrame(columns=["Brand", "Code"]),
+            "ModelCodes": pd.DataFrame(columns=["Model", "Code"]),
+            "ColorCodes": pd.DataFrame(columns=["Color", "Code"])
         }
     return mappings
 
