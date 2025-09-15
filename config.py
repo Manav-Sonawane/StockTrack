@@ -1,0 +1,5 @@
+MASTER_FILE = "data/master_inventory.xlsx"
+NEW_STOCK_FILE = "data/new_stock.xlsx"
+MAPPINGS_FILE = "data/code_mappings.xlsx"
+BACKUPS_DIR = "backups"
+BARCODES_DIR = "output/barcodes"
