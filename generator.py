@@ -8,7 +8,7 @@ def generate_barcodes(df):
     # Load existing mappings
     merge_to_master(df)
     mappings = load_mappings()
-    brand_df, model_df, color_df = mappings["BrandCodes"], mappings["ModelCodes"], mappings["ColorCodes"]
+    brand_df, model_df, color_df = mappings["Brand"], mappings["Model"], mappings["Color"]
 
     for _, row in df.iterrows():
         uid = row["UID"]
